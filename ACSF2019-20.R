@@ -563,7 +563,7 @@ ui <- fluidPage(
              tags$a(href="https://www.abs.gov.au/statistics/health/health-conditions-and-risks/apparent-consumption-selected-foodstuffs-australia/2019-20/4316DO001_201920.xls",
                     "Download the published data tables (xls)"),
              br(),
-             tags$a(href="https://github.com/Atyepa/Labour-Force-Australia-ShinyApp/blob/main/LFS_tseries.R#L123",
+             tags$a(href="https://github.com/Atyepa/ACSF-Australia-ShinyApp",
                     target="_blank", "See the ShinyApp code at GitHub"))
     ),
     mainPanel(
