@@ -3,7 +3,6 @@
 # Provides detailed consumption of foods, the amounts of Nutrients from those foods, based on supermarket sales data. 
 # Data source is Apparent Consumption of Selected Foodstuffs, Australia, 2020-21
 # https://www.abs.gov.au/statistics/health/health-conditions-and-risks/apparent-consumption-selected-foodstuffs-australia/
-# See it in action at: https://atyepa.shinyapps.io/ACSF_2020_21/ 
 #====================================================================================================================
 library(tidyverse) 
 library(openxlsx)
@@ -18,29 +17,21 @@ library(radiant.data)
 library(ggthemes)
 library(rsconnect)
 
-#--- Preliminaries---
+options(warn=-1)
+
+#--- Define plot colours---
+abscol <- c("#4FADE7", 	"#1A4472", 	"#F29000", 	"#993366", 	"#669966", 	"#99CC66",
+            "#CC9966", 	"#666666", 	"#8DD3C7", 	"#BEBADA", 	"#FB8072", 	"#80B1D3",
+            "#FDB462", 	"#B3DE69", 	"#FCCDE5", 	"#D9D9D9", 	"#BC80BD", 	"#CCEBC5", 	"#ffcc99")
 
 #-- Download datacube
 daturl <- "https://www.abs.gov.au/statistics/health/health-conditions-and-risks/apparent-consumption-selected-foodstuffs-australia/2020-21/4316DO001_202021_ESTIMATES.xlsx"
-
 
 download.file(daturl,"datacube.xlsx", mode = "wb" )
 
 datapath <- "./datacube.xlsx"
 
-options(warn=-1)
-
-`%!in%` = Negate(`%in%`)
-
-abscol <- c("#336699", "#669966", "#99CC66", "#993366", "#CC9966", "#666666", 
-            "#8DD3C7",  "#BEBADA", "#FB8072", "#80B1D3", "#FDB462", "#B3DE69", 
-            "#FCCDE5","#D9D9D9", "#BC80BD", "#CCEBC5", "#ffcc99")
-
-#======================================================================================================
-
-#---- Load latest Datacube from local directory  -------------------------
-
-#---Annual aggregates---
+#---Load annual aggregates---
 iA1.1 <- read_excel(datapath, sheet = 2, range = "A7:I148")
 iA2.1 <- read_excel(datapath, sheet = 4, range = "A8:E57")
 iA3.1 <- read_excel(datapath, sheet = 6, range = "A8:G27")
@@ -61,7 +52,7 @@ iA13.1 <- read_excel(datapath, sheet = 22, range = "A8:I148")
 iA14.1 <- read_excel(datapath, sheet = 23, range = "A7:K189")
 
 
-#--- Monthly aggregates---
+#---Load monthly aggregates---
 iM1.2 <- read_excel(datapath, sheet = 3, range = "A7:AM147")
 iM2.2 <- read_excel(datapath, sheet = 5, range = "A7:D1591")
 iM3.2 <- read_excel(datapath, sheet = 7, range = "A6:AI44")
@@ -821,7 +812,7 @@ ui <- shinyUI(fluidPage(
                            conditionalPanel( condition = "input.Subgrp == 'ADG'",
                                              
                                              pickerInput("ADGgrp2", "Select from ADG foods:", choices = c("Grains","Veg", "Fruit", "Dairy", "Meats", "UnsatFat"), 
-                                                         selected = c("Grains","Veg", "Fruit", "Dairy", "Meats", "UnsatFat"), 
+                                                         selected = c("Grains","Veg", "Fruit", "Dairy", "Meats"), 
                                                          multiple = TRUE, options = list(`actions-box` = TRUE))),
                            
                            radioButtons("Disctype1", "Discretionary status:", choices = c("NonDisc", "Disc", "Total"),
@@ -1086,7 +1077,7 @@ server <- function(input, output) {
          filter(cLabel %in% Maj2()$Majgrp2 | cLabel %in% Min2()$Mingrp2 | Label %in% Othgrp2()$Othgrp2) %>% 
          group_by(Nutrient, cLabel) %>% 
          arrange(Date) %>% ungroup() %>% 
-         mutate(nxt = if_else(Date< max(Date), lead(Date), Date))%>%
+         mutate(nxt = Date) %>% 
          filter(nxt >= input$dateRange[1]) %>%  
          filter(Date <= input$dateRange[2]) %>% 
          select(-cLabel, -nxt)
@@ -1109,7 +1100,7 @@ server <- function(input, output) {
          filter(Nutrient %in% Macronut()$Macronut | Nutrient %in% Micronut()$Micronut)%>%
          group_by(Nutrient, Unit, Type) %>% 
          arrange(Date) %>% ungroup() %>% 
-         mutate(nxt = if_else(Date< max(Date), lead(Date), Date))%>%
+         mutate(nxt = Date) %>% 
          filter(nxt>= input$dateRange[1]) %>%  
          filter(Date <= input$dateRange[2]) %>%
          filter(Type == Type()$Type) %>% 
@@ -1146,7 +1137,7 @@ server <- function(input, output) {
          filter(Disc_type == Disctype2()$Disctype2) %>% 
          group_by(Unit, ADG_group, Disc_type) %>% 
          arrange(Date) %>%
-         mutate(nxt = if_else(Date< max(Date), lead(Date), Date))%>%
+         mutate(nxt = Date) %>% 
          filter(nxt>= input$dateRange[1]) %>%  
          filter(Date <= input$dateRange[2]) %>%
          ungroup() %>% 
@@ -1205,7 +1196,7 @@ server <- function(input, output) {
          filter(Unit == BevUnit1()$BevUnit1 | Unit == BevUnit2()$BevUnit2 | Unit == BevUnit3()$BevUnit3 | Unit == BevUnit4()$BevUnit4) %>% 
          group_by(Beverage_group) %>% 
          arrange(Date) %>% ungroup() %>% 
-         mutate(nxt = if_else(Date< max(Date), lead(Date), Date))%>%
+         mutate(nxt = Date) %>% 
          filter(nxt>= input$dateRange[1]) %>%  
          filter(Date <= input$dateRange[2]) %>% 
          ungroup() %>% 
@@ -1236,7 +1227,7 @@ server <- function(input, output) {
             group_by(Beverage_group) %>% 
             arrange(Year) %>% ungroup() %>% 
             hchart(.,
-                   type = "bar",
+                   type = "column",
                    hcaes(x = Year,
                          y = Val,
                          group = Beverage_group)) %>%
@@ -1249,7 +1240,7 @@ server <- function(input, output) {
          
          if(input$graphstack2 == "Stacked"){ 
             hc <- hc %>% 
-               hc_plotOptions(bar = list(stacking = "normal")) 
+               hc_plotOptions(column = list(stacking = "normal")) 
             
          }
       }  
@@ -1263,7 +1254,7 @@ server <- function(input, output) {
             group_by(Beverage_group) %>% 
             arrange(Year) %>% ungroup() %>% 
             hchart(.,
-                   type = "bar",
+                   type = "column",
                    hcaes(x = Year,
                          y = Pc,
                          group = Beverage_group)) %>%
@@ -1276,7 +1267,7 @@ server <- function(input, output) {
          
          if(input$graphstack2 == "Stacked"){ 
             hc <- hc %>% 
-               hc_plotOptions(bar = list(stacking = "normal")) 
+               hc_plotOptions(column = list(stacking = "normal")) 
             
          }
       }     
@@ -1484,10 +1475,10 @@ server <- function(input, output) {
       if(input$choosetype == 'ADG' &  input$choosetime == 'Finyr' & input$Subgrp == 'ADG')  {
          
          hc <- df_ADG_fy() %>% 
-            group_by(Year, ADG_group) %>% 
-            arrange(Year) %>% ungroup() %>% 
+            group_by(Year) %>% 
+            arrange(Year, desc(Val)) %>% ungroup() %>% 
             hchart(.,
-                   type = "bar",
+                   type = "column",
                    hcaes(x = ADG_group,
                          y = Val,
                          group = Year)) %>%
@@ -1529,7 +1520,7 @@ server <- function(input, output) {
             group_by(Year, ADG_group) %>% 
             arrange(desc(Val)) %>% ungroup() %>% 
             hchart(.,
-                   type = "bar",
+                   type = "column",
                    hcaes(x = ADG_subgroup,
                          y = Val,
                          group = Year)) %>%
@@ -1672,7 +1663,6 @@ server <- function(input, output) {
    ) 
    
 }
-
 
 #====================================
 shinyApp(ui, server)
