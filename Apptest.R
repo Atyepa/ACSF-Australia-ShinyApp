@@ -6,8 +6,7 @@ library(highcharter)
 dmin <- "2018-07-01"
 dmax <- "2022-12-01"
 
-ui <- dashboardPage(
-    
+ui <- dashboardPage(   
     dashboardHeader(title = " "),
     dashboardSidebar(
     width = 300,
@@ -18,8 +17,7 @@ ui <- dashboardPage(
                     step = 3,
                     timeFormat="%b %Y")
         ),
-    
-    
+        
     dashboardBody(
         tags$head(tags$style(HTML(
             '.myClass {
