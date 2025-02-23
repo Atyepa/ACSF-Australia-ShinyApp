@@ -1,11 +1,11 @@
 # ACSF-Australia-ShinyApp
-ShinyApp to visualise the amount of foods sold from supermarket/specialist/convenience food stores across Australia from 2018-19 to 2019-20.
-The source data is the ABS Apparent Consumption of Selected Foodstuffs (ACSF) available from https://www.abs.gov.au/statistics/health/health-conditions-and-risks/apparent-consumption-selected-foodstuffs-australia/2019-20
+ShinyApp to visualise the amount of foods sold from supermarket/specialist/convenience food stores across Australia from 2018-19 to 2022-22.
+The source data is the ABS Apparent Consumption of Selected Foodstuffs (ACSF) available from https://www.abs.gov.au/statistics/health/health-conditions-and-risks/apparent-consumption-selected-foodstuffs-australia/2022-23
 
 The ACSF codes all foods sold from supermarkets to the AUSNUT 2011-13 classification (see: https://github.com/Atyepa/AUSNUT). 
-All published data was based on daily per capita amounts (dividing by estimated population and number of days in the period), except for gross sales (which is total tonnes per year). An explanantion of the methodology is published at https://www.abs.gov.au/methodologies/apparent-consumption-selected-foodstuffs-australia-methodology/2019-20.
+All published data was based on daily per capita amounts (dividing by estimated population and number of days in the period), except for gross sales (which is total tonnes per year). An explanantion of the methodology is published at https://www.abs.gov.au/methodologies/apparent-consumption-selected-foodstuffs-australia-methodology/2022-23.
 
-See the app in action at: https://atyepa.shinyapps.io/ACSF_2020_21/
+See the app in action at: https://atyepa.shinyapps.io/ACSF_2022_23/
 
 This ShinyApp was designed to allow the user to interact with the available data to visualise answers to questions such as:
 1) What is the total amount (weight, energy, macronutrients) of all foods and beverages sold?
